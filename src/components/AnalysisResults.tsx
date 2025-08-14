@@ -2,12 +2,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Star, TrendingUp, AlertTriangle, CheckCircle, Users } from "lucide-react";
+import { Scene3D } from "./3D/Scene3D";
+import { useGSAPAnimations } from "@/hooks/useGSAPAnimations";
+import { useEffect, useRef } from "react";
 
 interface AnalysisResultsProps {
   productUrl: string;
 }
 
 export const AnalysisResults = ({ productUrl }: AnalysisResultsProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { staggerAnimation } = useGSAPAnimations();
+
+  useEffect(() => {
+    if (containerRef.current) {
+      staggerAnimation(".analysis-card", {
+        from: { opacity: 0, y: 30, rotateX: -15 },
+        to: { opacity: 1, y: 0, rotateX: 0 },
+        duration: 0.8,
+      }, 0.1);
+    }
+  }, []);
+
   const mockData = {
     productName: "Premium Wireless Headphones",
     overallScore: 87,
@@ -43,9 +59,9 @@ export const AnalysisResults = ({ productUrl }: AnalysisResultsProps) => {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-6">
+    <div ref={containerRef} className="w-full max-w-6xl mx-auto space-y-6">
       {/* Product Header */}
-      <Card className="shadow-card">
+      <Card className="analysis-card shadow-card hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] bg-gradient-to-r from-card to-card/95 backdrop-blur-sm border border-border/50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CheckCircle className="h-5 w-5 text-success" />
@@ -57,7 +73,7 @@ export const AnalysisResults = ({ productUrl }: AnalysisResultsProps) => {
 
       {/* Main Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="shadow-card">
+        <Card className="analysis-card shadow-card hover:shadow-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-success/5 to-success/10 border border-success/20">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Overall Score</CardTitle>
           </CardHeader>
@@ -76,7 +92,7 @@ export const AnalysisResults = ({ productUrl }: AnalysisResultsProps) => {
           </CardContent>
         </Card>
 
-        <Card className="shadow-card">
+        <Card className="analysis-card shadow-card hover:shadow-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Users className="h-4 w-4" />
@@ -89,7 +105,7 @@ export const AnalysisResults = ({ productUrl }: AnalysisResultsProps) => {
           </CardContent>
         </Card>
 
-        <Card className="shadow-card">
+        <Card className="analysis-card shadow-card hover:shadow-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-accent/5 to-accent/10 border border-accent/20">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
@@ -103,38 +119,46 @@ export const AnalysisResults = ({ productUrl }: AnalysisResultsProps) => {
         </Card>
       </div>
 
-      {/* Sentiment Analysis */}
-      <Card className="shadow-card">
+      {/* Sentiment Analysis with 3D Visualization */}
+      <Card className="analysis-card shadow-card hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/90 backdrop-blur-sm border border-border/50">
         <CardHeader>
           <CardTitle>Sentiment Breakdown</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-success">Positive</span>
-              <span className="text-sm">{mockData.sentiment.positive}%</span>
-            </div>
-            <Progress value={mockData.sentiment.positive} className="h-2" />
+        <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* 3D Visualization */}
+          <div className="h-64 rounded-lg overflow-hidden bg-gradient-to-br from-background/50 to-secondary/30 border border-border/30">
+            <Scene3D variant="analytics" />
           </div>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-warning">Neutral</span>
-              <span className="text-sm">{mockData.sentiment.neutral}%</span>
+          
+          {/* Progress Bars */}
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-success">Positive</span>
+                <span className="text-sm font-bold">{mockData.sentiment.positive}%</span>
+              </div>
+              <Progress value={mockData.sentiment.positive} className="h-3 bg-success/20" />
             </div>
-            <Progress value={mockData.sentiment.neutral} className="h-2" />
-          </div>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-destructive">Negative</span>
-              <span className="text-sm">{mockData.sentiment.negative}%</span>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-warning">Neutral</span>
+                <span className="text-sm font-bold">{mockData.sentiment.neutral}%</span>
+              </div>
+              <Progress value={mockData.sentiment.neutral} className="h-3 bg-warning/20" />
             </div>
-            <Progress value={mockData.sentiment.negative} className="h-2" />
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-destructive">Negative</span>
+                <span className="text-sm font-bold">{mockData.sentiment.negative}%</span>
+              </div>
+              <Progress value={mockData.sentiment.negative} className="h-3 bg-destructive/20" />
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Key Insights */}
-      <Card className="shadow-card">
+      <Card className="analysis-card shadow-card hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-accent/5 to-accent/10 border border-accent/20">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-accent" />
@@ -154,7 +178,7 @@ export const AnalysisResults = ({ productUrl }: AnalysisResultsProps) => {
       </Card>
 
       {/* Sample Reviews */}
-      <Card className="shadow-card">
+      <Card className="analysis-card shadow-card hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-card/95 backdrop-blur-sm border border-border/50">
         <CardHeader>
           <CardTitle>Sample Reviews</CardTitle>
         </CardHeader>
